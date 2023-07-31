@@ -1,0 +1,46 @@
+# Node.js specific
+node_modules/
+images/
+npm-debug.log
+yarn-error.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor specific
+*.swp
+*.swo
+*.swn
+*.swm
+*.bak
+*.backup
+*~
+*.log
+
+# Environment variables and sensitive information
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build output and dependencies
+build/
+dist/
+out/
+.cache/
+*.zip
+*.tar.gz
+*.tgz
+yarn.lock
+package-lock.json
+npm-shrinkwrap.json
+
+# Ignore package lock files for individual packages (if used)
+/packages/*/package-lock.json
+/packages/*/npm-shrinkwrap.json
+
+# Ignore Jest coverage report
+/coverage/
