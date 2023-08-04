@@ -4,7 +4,7 @@ const { userRegister, userLogin } = require("../controller/authController");
 const multer = require("multer");
 
 const storageEngine = multer.diskStorage({
-  destination: "./images/categories",
+  destination: "./images/users",
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}--${file.originalname}`);
   },

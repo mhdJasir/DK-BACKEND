@@ -23,10 +23,20 @@ const userRegister = async (req, res) => {
     const user = await User.create(req.body);
     const token = user.generateToken();
     user.token = token;
+    user.password = undefined;
+    user.__v = undefined;
+    user.id = user._id;
+    user.password = undefined;
     return res.send({
       status: true,
       message: "User registered successfully",
-      data: user,
+      data: {
+        id: user._id,
+        name: user.name,
+        mobile: user.mobile,
+        image: user.image,
+        created_at: user.created_at,
+      },
     });
   } catch (e) {
     if (e) {

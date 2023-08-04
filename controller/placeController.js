@@ -271,6 +271,7 @@ const getPlace = async (req, res) => {
         $project: {
           _id: 0,
           id: "$_id",
+          name: 1,
           catagory_id: 1,
           catagory: 1,
           district: 1,
