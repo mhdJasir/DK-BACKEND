@@ -302,11 +302,11 @@ const getPlace = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
     if (req.user && ObjectId.isValid(req.user._id)) {
-      const likeData = await LikeModel.findOne({ user_id: userId });
+      const likeData = await LikeModel.findOne({ user_id: userId,place_id: placeId });
       if (likeData) {
         isLiked = likeData.is_liked;
       }
-      const favouriteData = await FavouriteModel.findOne({ user_id: userId });
+      const favouriteData = await FavouriteModel.findOne({ user_id: userId ,place_id: placeId});
       if (favouriteData) {
         isFavourite = favouriteData.is_favourite;
       }
