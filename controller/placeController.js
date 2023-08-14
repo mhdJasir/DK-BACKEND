@@ -1,7 +1,6 @@
 const placeModel = require("../Models/placeModel.js");
 const FavouriteModel = require("../Models/favouriteModel.js");
 const LikeModel = require("../Models/placeLikeModel.js");
-const LikeCountModel = require("../Models/likeCountModel.js");
 const fs = require("fs");
 const { default: mongoose } = require("mongoose");
 const ObjectId = require("mongoose").Types.ObjectId;
@@ -302,21 +301,24 @@ const getPlace = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
     if (req.user && ObjectId.isValid(req.user._id)) {
-      const likeData = await LikeModel.findOne({ user_id: userId,place_id: placeId });
+      const likeData = await LikeModel.findOne({
+        user_id: userId,
+        place_id: placeId,
+      });
       if (likeData) {
         isLiked = likeData.is_liked;
       }
-      const favouriteData = await FavouriteModel.findOne({ user_id: userId ,place_id: placeId});
+      const favouriteData = await FavouriteModel.findOne({
+        user_id: userId,
+        place_id: placeId,
+      });
       if (favouriteData) {
         isFavourite = favouriteData.is_favourite;
       }
       place[0].wish_list = isFavourite;
       place[0].user_like = isLiked;
     }
-    const likeCountData = await LikeCountModel.findOne({ place_id: placeId });
-    if(likeCountData){
-      place[0].like_count=likeCountData.like_count;
-    }
+
     return res.send({
       status: true,
       data: place[0],
@@ -345,41 +347,36 @@ const placeLike = async (req, res) => {
   }
   const userId = new mongoose.Types.ObjectId(req.user._id);
 
-  const updatedPlaceLike = await LikeModel.findOneAndUpdate(
-    { user_id: userId,place_id: placeId },
-    [
-      {
-        $set: {
-          is_liked: {
-            $cond: {
-              if: { $eq: ["$is_liked", null] },
-              then: true,
-              else: { $not: "$is_liked" },
-            },
-          },
-        },
-      },
-    ],
-    {
-      upsert: true,
-      new: true,
-    }
-  );
-  let incrementCount = updatedPlaceLike.is_liked ? 1 : -1;
-  await LikeCountModel.findOneAndUpdate(
-    { place_id: placeId },
+  const updatedPlaceLike = await LikeModel.findOneAndDelete({
+    user_id: userId,
+    place_id: placeId,
+  });
+  let isLiked = true;
+  if (updatedPlaceLike) {
+    isLiked = false;
+  } else {
+    await LikeModel.create({
+      user_id: userId,
+      place_id: placeId,
+      is_liked: true,
+    });
+  }
+  let incrementCount = isLiked ? 1 : -1;
+
+  await placeModel.findOneAndUpdate(
+    { _id: placeId },
     { $inc: { like_count: incrementCount } },
-    { upsert: true, new: true }
+    { new: true }
   );
+
   return res.send({
     status: true,
-    message: updatedPlaceLike.is_liked ? "Liked" : "Un Liked",
+    message: isLiked ? "Liked" : "Un Liked",
     data: {
       status: true,
     },
   });
 };
-
 
 module.exports = {
   addPlace,

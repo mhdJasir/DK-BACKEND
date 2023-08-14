@@ -86,6 +86,13 @@ const place = mongoose.Schema({
   images: {
     type: Array,
   },
+  likes: {
+    type: Array,
+  },
+  like_count: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const placeModel = mongoose.model("place", place);
