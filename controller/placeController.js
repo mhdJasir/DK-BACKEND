@@ -48,14 +48,12 @@ const addPlace = async (req, res) => {
         .send({ status: false, message: "district is required" });
 
     let { image, images } = req.files;
-    let primeImage = "";
-    console.log(image);
+    let primeImage;
     if (image.length > 0) {
       console.log("Here");
       primeImage = `${req.protocol}://${req.get("host")}/${image[0].path}`;
     }
 
-    console.log(primeImage);
     let array = [];
 
     if (images.length > 0) {
@@ -259,11 +257,17 @@ const getPlace = async (req, res) => {
       return res.status(400).send({ status: false, message: "Invalid id" });
     }
     const placeId = new mongoose.Types.ObjectId(place_id);
+    const userId = new mongoose.Types.ObjectId(req.user._id);
 
     let place = await placeModel.aggregate([
       {
         $match: {
           _id: placeId,
+        },
+      },
+      {
+        $addFields: {
+          likes: { $ifNull: ["$likes", []] },
         },
       },
       {
@@ -285,9 +289,10 @@ const getPlace = async (req, res) => {
           desc_eng: 1,
           desc_mal: 1,
           rating: { $ifNull: ["$rating", null] },
+          user_like: { $in: [userId, "$likes"] },
           like_count: { $ifNull: ["$like_count", null] },
           addi_info: { $ifNull: ["$addi_info", null] },
-          destination_images: { $ifNull: ["$destination_images", null] },
+          images: { $ifNull: ["$images", null] },
         },
       },
       {
@@ -298,7 +303,6 @@ const getPlace = async (req, res) => {
     ]);
     let isLiked = false;
     let isFavourite = false;
-    const userId = new mongoose.Types.ObjectId(req.user._id);
 
     if (req.user && ObjectId.isValid(req.user._id)) {
       const likeData = await LikeModel.findOne({
@@ -347,34 +351,30 @@ const placeLike = async (req, res) => {
   }
   const userId = new mongoose.Types.ObjectId(req.user._id);
 
-  const updatedPlaceLike = await LikeModel.findOneAndDelete({
-    user_id: userId,
+  const place = await LikeModel.findOneAndDelete({
     place_id: placeId,
+    user_id: userId,
   });
-  let isLiked = true;
-  if (updatedPlaceLike) {
-    isLiked = false;
-  } else {
+
+  let isLiked = false;
+  if (!place) {
     await LikeModel.create({
-      user_id: userId,
       place_id: placeId,
+      user_id: userId,
       is_liked: true,
     });
+    isLiked = true;
   }
   let incrementCount = isLiked ? 1 : -1;
 
   await placeModel.findOneAndUpdate(
     { _id: placeId },
-    { $inc: { like_count: incrementCount } },
-    { new: true }
+    { $inc: { like_count: incrementCount } }
   );
 
-  return res.send({
+  res.json({
     status: true,
-    message: isLiked ? "Liked" : "Un Liked",
-    data: {
-      status: true,
-    },
+    message: `Place ${isLiked ? "liked" : "unliked"} successfully`,
   });
 };
 

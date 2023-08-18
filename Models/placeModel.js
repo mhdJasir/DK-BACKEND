@@ -88,6 +88,7 @@ const place = mongoose.Schema({
   },
   likes: {
     type: Array,
+    default: [],
   },
   like_count: {
     type: Number,
