@@ -49,14 +49,14 @@ const addPlace = async (req, res) => {
 
     let { image, images } = req.files;
     let primeImage;
-    if (image.length > 0) {
+    if (image && image.length > 0) {
       console.log("Here");
       primeImage = `${req.protocol}://${req.get("host")}/${image[0].path}`;
     }
 
     let array = [];
 
-    if (images.length > 0) {
+    if (images && images.length > 0) {
       images.map((image) => {
         array.push(`${req.protocol}://${req.get("host")}/${image.path}`);
       });
@@ -116,6 +116,7 @@ const addPlace = async (req, res) => {
         .status(400)
         .send({ status: false, message: "This place exists" });
     }
+    console.log(e);
     return res.status(500).send({ message: "Something went wrong" });
   }
 };
