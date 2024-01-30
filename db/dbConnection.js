@@ -5,7 +5,7 @@ require("dotenv").config()
 const connectionParams = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    authSource: "admin",
+    authSource: "dk",
     user: process.env.USER_NAME,
     pass: process.env.PASSWORD
 };
