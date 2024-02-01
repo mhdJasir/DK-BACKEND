@@ -44,13 +44,13 @@ router.post(
   updatePlace
 );
 
-router.get("/getPlaces", getPlaces);
-router.get("/getPlace", getPlace);
+router.post("/getPlaces", getPlaces);
+router.post("/getPlace", getPlace);
 router.post("/placeLike", placeLike);
 router.post("/addWishList", addWishList);
 router.get("/getWishList", getWishList);
 router.post("/addReview", addReview);
-router.get("/getReviews", getReviews);
+router.post("/getReviews", getReviews);
 router.get("/getPopularPlaces", getPopularPlaces);
 router.post("/addToPoularPlaces", addToPoularPlaces);
 
